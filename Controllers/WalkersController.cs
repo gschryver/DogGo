@@ -135,7 +135,7 @@ namespace DogGo.Controllers
 
         private int GetCurrentUserId()
         {
-            string id = User?.FindFirstValue(ClaimTypes.NameIdentifier); // will give us the user's email
+            string id = User?.FindFirstValue(ClaimTypes.NameIdentifier); // this is the ID of the logged in user
 
             if (string.IsNullOrEmpty(id)) // if the user is not logged in, id will be null
             {
