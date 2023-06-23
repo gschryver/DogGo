@@ -253,6 +253,50 @@ namespace DogGo.Repositories
                 }
             }
         }
+
+        public List<Walker> GetWalkersByNeighborhoodId(int neighborhoodId)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                SELECT w.Id, w.Name, w.ImageUrl, w.NeighborhoodId, n.Name AS NeighborhoodName
+                FROM Walker w
+                LEFT JOIN Neighborhood n ON n.Id = w.NeighborhoodId
+                WHERE w.NeighborhoodId = @neighborhoodId
+            ";
+
+                    cmd.Parameters.AddWithValue("@neighborhoodId", neighborhoodId);
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    List<Walker> walkers = new List<Walker>();
+                    while (reader.Read())
+                    {
+                        Walker walker = new Walker
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                            ImageUrl = reader.GetString(reader.GetOrdinal("ImageUrl")),
+                            NeighborhoodId = reader.GetInt32(reader.GetOrdinal("NeighborhoodId")),
+                            Neighborhood = new Neighborhood
+                            {
+                                Name = reader.GetString(reader.GetOrdinal("NeighborhoodName"))
+                            }
+                        };
+
+                        walkers.Add(walker);
+                    }
+
+                    reader.Close();
+
+                    return walkers;
+                }
+            }
+        }
+
     }
 }
     
